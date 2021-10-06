@@ -1,0 +1,120 @@
+CREATE TABLE materials (
+	material_id serial PRIMARY KEY,
+	material_name VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE colors (
+	color_id serial PRIMARY KEY,
+	color_name VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE clothing_types (
+	type_id serial PRIMARY KEY,
+	type_name VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE clothing_subtypes (
+	subtype_id serial PRIMARY KEY,
+	subtype_name VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE sizes (
+	size_id serial PRIMARY KEY,
+	size_name VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE clothing_items_inventory (
+	clothing_id serial PRIMARY KEY,
+	type_id BIGINT NOT NULL,
+	subtype_id BIGINT NOT NULL,
+	size_id BIGINT NOT NULL,
+	color_id BIGINT NOT NULL,
+	material_id BIGINT NOT NULL,
+	quantity BIGINT NOT NULL,
+	unit_retail_price NUMERIC(4,2) NOT NULL,
+	link_to_item_image TEXT,
+	FOREIGN KEY (type_id) REFERENCES clothing_types (type_id),
+	FOREIGN KEY (subtype_id) REFERENCES clothing_subtypes (subtype_id),
+	FOREIGN KEY (size_id) REFERENCES sizes (size_id),
+	FOREIGN KEY (color_id) REFERENCES colors (color_id),
+	FOREIGN KEY (material_id) REFERENCES materials (material_id)
+);
+
+CREATE TABLE customer_information (
+    customer_id serial PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE addresses (
+    address_id serial PRIMARY KEY,
+    customer_id INT NOT NULL,
+    first_line VARCHAR(255) NOT NULL,
+    last_line VARCHAR(255),
+    city_town VARCHAR(255) NOT NULL,
+    county_state VARCHAR(255),
+    postcode VARCHAR(255),
+    FOREIGN KEY (customer_id) REFERENCES customer_information (customer_id)
+);
+
+CREATE TABLE default_delivery_address (
+    customer_id INT NOT NULL,
+    address_id INT NOT NULL,
+    PRIMARY KEY (customer_id, address_id),
+    FOREIGN KEY (customer_id) REFERENCES customer_information (customer_id),
+    FOREIGN KEY (address_id) REFERENCES addresses (address_id)
+);
+
+CREATE TABLE default_billing_address (
+    customer_id INT NOT NULL,
+    address_id INT NOT NULL,
+    PRIMARY KEY (customer_id, address_id),
+    FOREIGN KEY (customer_id) REFERENCES customer_information (customer_id),
+    FOREIGN KEY (address_id) REFERENCES addresses (address_id)
+);
+
+CREATE TABLE customer_address_book (
+    customer_id INT NOT NULL,
+    address_id INT NOT NULL,
+    PRIMARY KEY (customer_id, address_id),
+    FOREIGN KEY (customer_id) REFERENCES customer_information (customer_id),
+    FOREIGN KEY (address_id) REFERENCES addresses (address_id)
+);
+
+CREATE TABLE orders_information (
+    order_id serial PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    order_time TIME NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customer_information (customer_id)
+);
+
+CREATE table order_contents (
+	order_id INT NOT NULL,
+	clothing_id INT NOT NULL,
+	quantity INT NOT NULL,
+	PRIMARY KEY (order_id, clothing_id),
+	FOREIGN KEY (order_id) REFERENCES orders_information (order_id),
+	FOREIGN KEY (clothing_id) REFERENCES clothing_items_inventory (clothing_id)
+);
+
+
+CREATE table basket_content (
+	customer_id INT NOT NULL,
+	clothing_id INT NOT NULL,
+	quantity INT NOT NULL,
+	PRIMARY KEY (customer_id, clothing_id),
+	FOREIGN KEY (customer_id) REFERENCES customer_information (customer_id),
+	FOREIGN KEY (clothing_id) REFERENCES clothing_items_inventory (clothing_id)
+);
+
+UPDATE table_name
+SET column1 = value1,
+    column2 = value2,
+    ...
+WHERE condition;
+
+
